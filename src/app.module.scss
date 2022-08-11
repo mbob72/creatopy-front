@@ -1,0 +1,87 @@
+//body {
+//  margin: 40px;
+//}
+
+.sidebar {
+  grid-area: sidebar;
+}
+
+.content {
+  grid-area: content;
+  text-align: center;
+}
+
+.header {
+  grid-area: header;
+}
+
+
+.wrapper {
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: 33% 33% 34%;
+  grid-template-rows: 50px 1fr;
+  grid-template-areas:
+    "....... header header"
+    "sidebar content content"
+;
+  height: 100vh;
+  background-color: #fff;
+  color: #444;
+  margin: 20px;
+  margin-right: 40px;
+}
+
+
+.box {
+  background-color: #444;
+  color: #fff;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 150%;
+}
+
+.header,
+.footer {
+  background-color: #999;
+}
+
+.right {
+  text-align: right;
+}
+.center {
+  text-align: center;
+}
+.margin {
+  margin-left: 20px;
+}
+
+@font-face {
+  font-family: 'Font Awesome 5 Free';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("./webfonts/fa-regular-400.eot");
+  src: url("./webfonts/fa-regular-400.eot?#iefix") format("embedded-opentype"), url("./webfonts/fa-regular-400.woff2") format("woff2"), url("./webfonts/fa-regular-400.woff") format("woff"), url("./webfonts/fa-regular-400.ttf") format("truetype"), url("./webfonts/fa-regular-400.svg#fontawesome") format("svg"); }
+
+
+.far {
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  display: inline-block;
+  font-style: normal;
+  font-variant: normal;
+  text-rendering: auto;
+  line-height: 1;
+  font-family: "Font Awesome 5 Free";
+  font-weight: 400;
+}
+.fa-eye:before {
+  content: "\f06e"; }
+
+.fa-eye-dropper:before {
+  content: "\f1fb"; }
+
+.fa-eye-slash:before {
+  content: "\f070"; }
+
