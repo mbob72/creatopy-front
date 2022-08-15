@@ -1,5 +1,16 @@
 import {useEffect, useState} from "react";
 
+import { gql, useQuery } from '@apollo/client';
+
+const GET_GREETING = gql`
+  query GetGreeting($language: String!) {
+    greeting(language: $language) {
+      message
+    }
+  }
+`;
+
+
 export const useGetUserList = (ifList: boolean, userID: number | null) => {
     const [loaded, setLoaded] = useState(false)
     const [userList, setUserList] = useState(null as any[] | null);
