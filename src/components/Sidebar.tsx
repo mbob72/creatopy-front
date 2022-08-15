@@ -15,11 +15,16 @@ function NewItem({ sendNew }: any) {
     )
 }
 
-function ToSignUp() {
-    return (
+function ToSignUp({ user }: any) {
+    return !user ? (
         <div className={styles.center} >
             <div>No Account?</div>
             <Link to="/register">Sign up</Link>
+        </div>
+    ) : (
+        <div className={styles.center} >
+            <div>Show items?</div>
+            <Link to="/">Yep...</Link>
         </div>
     )
 }
@@ -32,16 +37,16 @@ function ToMain() {
     return (<div className={styles.center} ><Link to={'/'}>To main page</Link></div>)
 }
 
-export default ({user, userLoaded, ifList, pathname }: any) => {
+export default ({ user, ifList, pathname }: any) => {
     let content = <span></span>;
-    console.log('in sidebar::', user, userLoaded, ifList )
+    console.log('in sidebar::', user,  ifList )
     switch (true) {
-        case !!(userLoaded && ifList && user):
+        case !!( ifList && user):
             content = (<NewItem sendNew={(e: string) => console.log('sent::', e)}/>);
             break;
-        case !!(ifList && userLoaded && !user):
+        case !!(ifList && !user):
         case pathname === '/login':
-            content = (<ToSignUp />);
+            content = (<ToSignUp user={user}/>);
             break;
         case pathname === '/register':
             content = (<ToLogin />);

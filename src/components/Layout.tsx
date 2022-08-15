@@ -5,20 +5,21 @@ import Sidebar from "./Sidebar";
 import classNames from 'classnames'
 import {Navigate, useLocation} from "react-router-dom";
 import {useGetUserList, useUser} from "./hooks";
+import {useState} from "react";
 
 const haveUser = true
 export default () => {
+    const [login, setLogin] = useState({ user: null, token: null})
     const { pathname } = useLocation();
     const ifList = pathname === '/';
-    const { user, loaded: userLoaded } = useUser(ifList)
-    const { userList, loaded } = useGetUserList(userLoaded, user && user!.id);
-    if(ifList && !user && userLoaded)
+    const { user } = login;
+    if(ifList && !user )
     return <Navigate to="/login" />
     return (
         <>
-            <Header { ...{user, userLoaded, ifList, pathname }}/>
-            <Sidebar { ...{user, userLoaded, ifList, pathname }}/>
-            <Content { ...{ loaded, ifList, pathname, userList }}/>
+            <Header { ...{  ifList, pathname, user: login.user }}/>
+            <Sidebar { ...{  ifList, pathname, user: login.user }}/>
+            <Content { ...{ ifList, pathname,  setLogin }}/>
         </  >
     )
 }

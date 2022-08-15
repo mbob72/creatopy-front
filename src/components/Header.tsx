@@ -3,13 +3,13 @@ import styles from "../app.module.scss";
 import {Link} from "react-router-dom";
 
 
-export default ({ user, userLoaded, ifList, pathname }: any) => {
+export default ({ user,  ifList, pathname }: any) => {
     let content;
     let right = false;
     switch (true) {
         case ifList:
             right = true;
-            content = (<div>{user && user!.name}</div>);
+            content = (<div>{user && user!.fullName}</div>);
             break
         case pathname === '/login':
             content = ('Login please!')
@@ -29,7 +29,10 @@ export default ({ user, userLoaded, ifList, pathname }: any) => {
             [styles.right]: right,
             [styles.center]: !right
         })}>{ifList
-            ? userLoaded ? <><Link to="/login">Re-login</Link><span className={styles.margin}>{user && user!.name || 'No user'}</span></> : 'Loaded...'
-            : content}</div>
+            ? <>
+                <Link to="/login">Re-login</Link>
+                <span className={styles.margin}>{user && user!.fullName || 'No user'}</span>
+            </>
+            : user ? user.fullName : content}</div>
     )
 }
