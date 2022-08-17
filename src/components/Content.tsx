@@ -70,7 +70,8 @@ const Content = ({ ifList, pathname }: any) => {
         <div className={classNames(styles.box, styles.content, !ifList && styles.boxForm)}>{anotherScreen}</div>
     )
 }
-export default Content
+export default Content;
+
 function LoginForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState('')
@@ -84,7 +85,7 @@ function LoginForm() {
     });
     const disable = error || loading || !email || !password
     useEffect(() => {
-        setTimeout(() => {
+        error && setTimeout(() => {
             setEmail('');
             setPassword('');
             reset()
