@@ -1,15 +1,17 @@
 import classNames from "classnames";
 import styles from "../app.module.scss";
 import {Link} from "react-router-dom";
+import {useAuthToken} from "../hooks";
 
 
-export default ({ user,  ifList, pathname }: any) => {
+export default ({ ifList, pathname }: any) => {
     let content;
     let right = false;
+    const [{ user }] = useAuthToken()
     switch (true) {
         case ifList:
             right = true;
-            content = (<div>{user && user!.fullName}</div>);
+            content = (<div>{user?.fullName}</div>);
             break
         case pathname === '/login':
             content = ('Login please!')
@@ -31,8 +33,8 @@ export default ({ user,  ifList, pathname }: any) => {
         })}>{ifList
             ? <>
                 <Link to="/login">Re-login</Link>
-                <span className={styles.margin}>{user && user!.fullName || 'No user'}</span>
+                <span className={styles.margin}>{user?.fullName || 'No user'}</span>
             </>
-            : user ? user.fullName : content}</div>
+            : user?.fullName || content}</div>
     )
 }

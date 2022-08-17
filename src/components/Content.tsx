@@ -1,19 +1,26 @@
 import classNames from "classnames";
 import styles from "../app.module.scss";
 import {useEffect, useState} from "react";
+import {Link, Navigate} from "react-router-dom";
 
 import { gql, useQuery, useMutation } from '@apollo/client';
+import {useAuthToken} from "../hooks";
 
-const GET_GREETING = gql`
-  query GetGreeting($language: String!) {
-    greeting(language: $language) {
-      message
-    }
-  }
-`;
 const CREATE_USER = gql`
     mutation CreateUser($login: String!, $password: String!, $fullName: String!)  {
         createUser(createUserInput: { 
+            login: $login,
+            password: $password, 
+            fullName: $fullName }) {
+            id
+            login
+            fullName
+        }
+    }`
+
+const UPDATE_USER = gql`
+    mutation UpdateUser($login: String!, $password: String!, $fullName: String!)  {
+        updateUser(updateUserInput: { 
             login: $login,
             password: $password, 
             fullName: $fullName }) {
@@ -33,23 +40,25 @@ const CREATE_TOKEN = gql`
             user {
                 id
                 fullName
+                login
             }
         }
     }`
 
 
-export default ({ ifList, pathname, loaded, userList, setLogin }: any) => {
-    let anotherScrieen = <div>404 ERROR!!</div>
+export default ({ ifList, pathname, loaded, userList }: any) => {
+    const [{ token }] = useAuthToken();
+    let anotherScreen = <div>404 ERROR!!</div>
     switch (pathname) {
         case '/login':
-            anotherScrieen = <LoginForm setLogin={setLogin}/>;
+            anotherScreen = <LoginForm />;
             break;
         case '/register':
-            anotherScrieen = <RegisterForm />;
+            anotherScreen = <RegisterForm />;
             break;
-        case pathname === '/reset-password':
-            anotherScrieen = <ResetPasswordForm send={(a: any) => console.log('send reset::', a) }/>
-
+        case '/reset-password':
+            anotherScreen = token ? <ResetPasswordForm /> : <Navigate to="/login" />;
+            break;
     }
 
 
@@ -58,14 +67,20 @@ export default ({ ifList, pathname, loaded, userList, setLogin }: any) => {
         <div className={classNames(styles.box, styles.content, !ifList && styles.boxForm)}>{
             ifList
                 ? loaded && (userList as any[]).map((item: any) => <div>{item.title}</div>)
-                : anotherScrieen}</div>
+                : anotherScreen}</div>
     )
 }
-function LoginForm({ setLogin }: any) {
+function LoginForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('');
-    const [send, {data, loading, error, reset }] =  useMutation(CREATE_TOKEN);
+    const [{ user }, { setToken, setUser }, logout] = useAuthToken();
+    const [send, {loading, error, reset }] =  useMutation(CREATE_TOKEN, {
+        onCompleted: (data) => {
+            setToken!(data.createToken.token || '');
+            setUser!(data.createToken.user || '')
+        }
+    });
     const disable = error || loading || !email || !password
     useEffect(() => {
         setTimeout(() => {
@@ -74,12 +89,8 @@ function LoginForm({ setLogin }: any) {
             reset()
         }, 2000)
     }, [error])
-    useEffect(() => {
-       data && setLogin(data.createToken);
-    }, [data])
 
-  console.log('have status::', data, loading, error);
-  return <>{!data ? (
+  return <>{!user ? (
       <form
         className={styles.inform}
         onSubmit={(e) => {
@@ -118,7 +129,13 @@ function LoginForm({ setLogin }: any) {
               disabled={!!disable}
               className={classNames(styles.btn, styles.center)}
           >Sign Up</button>
-    </form>) : <div className={styles.warningBox}>You are :: {data.createToken.user.fullName}</div>}
+    </form>) : <div className={styles.inform}>You are :: {user.fullName}
+                <button
+                    className={classNames(styles.btn, styles.center)}
+                    onClick={() => logout()}>Log OUT</button>
+      <Link className={classNames(styles.btn, styles.center)} to="/reset-password">
+          Change password/user info</Link>
+                </div>}
       {error && <div className={styles.warningBox}>{error.toString()}</div>}
       {loading && <div className={styles.warningBox}>{'Loading...'}</div>}
       </>
@@ -208,72 +225,101 @@ function RegisterForm() {
         {!pwOk && <div className={styles.warningBox} >Passwords are not equal!</div>}
         {error && <div className={styles.warningBox}>{error.toString()}</div>}
         {loading && <div className={styles.warningBox}>{'Loading...'}</div>}
-        {data && <div className={styles.warningBox}>{'User created!!'}</div>}
+        {data && <div className={styles.warningBox}>{'User updated!!'}</div>}
     </>
     )
 }
 
 
-function ResetPasswordForm({ send }: any) {
+function ResetPasswordForm() {
+    const [{ user }] = useAuthToken();
     const [showPassword, setShowPassword] = useState(false);
-    const [passwordOld, setPasswordOld] = useState('');
-    const [newPassword, setNewPasswordNew] = useState('');
+    const [email, setEmail] = useState(user!.login)
+    const [fullName, setFullName] = useState(user!.fullName)
+    const [password, setPassword] = useState('');
     const [password2, setPassword2] = useState('');
-    const [email, setEmail] = useState('')
+    const [send, {data, loading, error, reset}] = useMutation(UPDATE_USER);
+    const [pwOk, setPwOk] = useState(true);
+    const [userCreated, setUserCreated] = useState(false)
+    const disable = error || loading || !email || !fullName || !password || !password2 || password !== password2
+    useEffect(() => {
+        error && setTimeout(() => {
+            setEmail(user!.login);
+            setFullName(user!.fullName);
+            setPassword('');
+            setPassword2('');
+            reset()
+        }, 2000)
+    }, [error])
+    useEffect(() => {
+        data && setUserCreated(true)
+    }, [data])
+    useEffect(() => {
+        setPwOk(password === password2);
+    }, [password, password2])
+
+
     return (
-        <form className="auth-form" onSubmit={(e) => send({ email, passwordOld, newPassword, password2 })}>
-            <div className="email mb-3">
-                <input type="email"
-                       className={`form-control`}
-                       id="email"
-                       name="email"
-                       value={email}
-                       placeholder="Email"
-                       onChange={(e) => setEmail(e.target.value)}
-                />
-
-            </div>
-
-            <div className="password mb-3">
-                <div className="input-group">
-                    <input type={showPassword ? 'text' : 'password'}
-                           className={`form-control`}
-                           name="password"
-                           id="password"
-                           value={passwordOld}
-                           placeholder="Password"
-                           onChange={(e) => setPasswordOld(e.target.value)}
-                    />
-
-                    <input type={showPassword ? 'text' : 'password'}
-                           className={`form-control`}
-                           name="password"
-                           id="password"
-                           value={newPassword}
-                           placeholder="Password"
-                           onChange={(e) => setNewPasswordNew(e.target.value)}
-                    />
-                    <input type={showPassword ? 'text' : 'password'}
-                           className={`form-control`}
-                           name="password"
-                           id="password"
-                           value={password2}
-                           placeholder="Password"
-                           onChange={(e) => setPassword2(e.target.value)}
-                    />
-                <br/>
-                    <button
-                        type="button"
-                        onClick={() => setShowPassword(i => !i)}>
-                        <i className={classNames(styles.far, styles[`fa-eye${showPassword ? '' : '-slash'}`])} ></i>
-                    </button>
-                </div>
-
-            </div>
-            <div className="text-center">
-                <button type="submit" className="btn btn-primary w-100 theme-btn mx-auto">Log In</button>
-            </div>
+        <>
+        <form
+            className={styles.inform}
+            onSubmit={(e) => {
+                e.preventDefault();
+                send( {
+                    variables: { login: email, password, fullName },
+                });
+            }
+            }>
+            <input type="email"
+                   className={styles['form-control']}
+                   id="email"
+                   name="email"
+                   value={email}
+                   placeholder="Email"
+                   onChange={(e) => setEmail(e.target.value)}
+            />
+            <input type="text"
+                   className={styles['form-control']}
+                   name="email"
+                   value={fullName}
+                   placeholder="Full name"
+                   onChange={(e) => setFullName(e.target.value)}
+            />
+            <input type={showPassword ? 'text' : 'password'}
+                   className={styles['form-control']}
+                   name="password"
+                   id="password"
+                   value={password}
+                   placeholder="Password"
+                   onChange={(e) => setPassword(e.target.value)}
+            />
+            <input type={showPassword ? 'text' : 'password'}
+                   className={styles['form-control']}
+                   name="password"
+                   id="password"
+                   value={password2}
+                   placeholder="Password"
+                   onChange={(e) => setPassword2(e.target.value)}
+            />
+            <button
+                type="button"
+                className={styles.btn}
+                onClick={() => setShowPassword(i => !i)}>
+                <i
+                    className={classNames(styles.far, styles[`fa-eye${showPassword ? '' : '-slash'}`])}
+                ></i>
+            </button>
+            <button
+                type="submit"
+                disabled={!!disable}
+                className={classNames(styles.btn, styles.center)}
+            >Update</button>
         </form>
+        {!pwOk && <div className={styles.warningBox} >Passwords are not equal!</div>}
+        {error && <div className={styles.warningBox}>{error.toString()}</div>}
+        {loading && <div className={styles.warningBox}>{'Loading...'}</div>}
+        {data && <div className={styles.warningBox}>{'User created!!'}</div>}
+    </>
     )
 }
 

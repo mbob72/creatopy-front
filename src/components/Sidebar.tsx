@@ -2,6 +2,7 @@ import classNames from "classnames";
 import styles from "../app.module.scss";
 import {Link} from "react-router-dom";
 import {useState} from "react";
+import {useAuthToken} from "../hooks";
 
 function NewItem({ sendNew }: any) {
     const [title, setTitle] = useState('');
@@ -37,12 +38,12 @@ function ToMain() {
     return (<div className={styles.center} ><Link to={'/'}>To main page</Link></div>)
 }
 
-export default ({ user, ifList, pathname }: any) => {
+export default ({ ifList, pathname }: any) => {
+    const [{ user }] = useAuthToken();
     let content = <span></span>;
-    console.log('in sidebar::', user,  ifList )
     switch (true) {
         case !!( ifList && user):
-            content = (<NewItem sendNew={(e: string) => console.log('sent::', e)}/>);
+            content = (<NewItem />);
             break;
         case !!(ifList && !user):
         case pathname === '/login':
@@ -55,7 +56,6 @@ export default ({ user, ifList, pathname }: any) => {
             content = (<ToMain />);
             break;
     }
-    console.log('content is::', content)
     return (
         <div className={classNames(styles.box, styles.sidebar)}>{content}</div>
     )
