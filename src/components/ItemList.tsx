@@ -2,6 +2,7 @@ import {useState} from "react";
 import styles from "../app.module.scss";
 import {gql, useMutation, useQuery} from "@apollo/client";
 import {AddItemMutation, AddItemMutationVariables, GetItemsQuery} from "../generated/graphql";
+import classNames from "classnames";
 
 const GET_ITEMS = gql`
     query GetItems {
@@ -49,11 +50,18 @@ export function NewItem() {
     const [title, setTitle] = useState('');
     return (
         <div className={styles.center}>
-            <label>Title</label><br/>
-            <input type={'text'} value={title} onChange={(e) => {
+            <label className={styles.title}>New Item</label><br/>
+            <input
+                type={'text'}
+                className={classNames(styles['form-control'], styles.itemTitle)}
+                placeholder="Titile"
+                value={title}
+                onChange={(e) => {
                 setTitle(e.target.value)
             }}/><br/>
-            <button onClick={() => {
+            <button
+                className={classNames(styles.btn, styles.center)}
+                onClick={() => {
                 addItem({variables: {createItemInput: {title}}});
                 setTitle('')
             }}>Add new

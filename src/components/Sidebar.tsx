@@ -9,22 +9,22 @@ function ToSignUp({ user }: any) {
     return !user ? (
         <div className={styles.center} >
             <div>No Account?</div>
-            <Link to="/register">Sign up</Link>
+            <Link className={styles.link} to="/register">Sign up</Link>
         </div>
     ) : (
         <div className={styles.center} >
             <div>Show items?</div>
-            <Link to="/">Yep...</Link>
+            <Link className={styles.link} to="/">Yep...</Link>
         </div>
     )
 }
 
 function ToLogin() {
-    return (<div className={styles.center} ><Link to="/login" >Login</Link></div>)
+    return (<div className={styles.center} ><Link className={styles.link} to="/login" >Login</Link></div>)
 }
 
 function ToMain() {
-    return (<div className={styles.center} ><Link to={'/'}>To main page</Link></div>)
+    return (<div className={styles.center} ><Link className={styles.link} to={'/'}>To main page</Link></div>)
 }
 
 export default ({ ifList, pathname }: any) => {

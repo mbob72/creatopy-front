@@ -131,7 +131,7 @@ function LoginForm() {
               disabled={!!disable}
               className={classNames(styles.btn, styles.center)}
           >Sign Up</button>
-    </form>) : <div className={styles.inform}>You are :: {user.fullName}
+      </form>) : <div className={styles.inform}>You are<div>:: {user.fullName} ::</div>
                 <button
                     className={classNames(styles.btn, styles.center)}
                     onClick={() => logout()}>Log OUT</button>

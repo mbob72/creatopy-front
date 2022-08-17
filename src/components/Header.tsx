@@ -32,7 +32,7 @@ export default ({ ifList, pathname }: any) => {
             [styles.center]: !right
         })}>{ifList
             ? <>
-                <Link to="/login">Re-login</Link>
+                <Link className={styles.link} to="/login">Re-login</Link>
                 <span className={styles.margin}>{user?.fullName || 'No user'}</span>
             </>
             : user?.fullName || content}</div>

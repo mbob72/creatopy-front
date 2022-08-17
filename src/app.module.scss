@@ -70,10 +70,18 @@
   margin: 10px;
 }
 
+.link {
+  color: black;
+}
+
 .list {
   display: block;
   margin: 20px;
 
+}
+
+.itemTitle {
+  margin-top: 40px;
 }
 
 .header,
@@ -118,7 +126,7 @@
 }
 
 .btn {
-  display: block;
+  display: inline-block;
   font-weight: 400;
   line-height: 1.5;
   margin: 20px 0;
