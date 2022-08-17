@@ -1,20 +1,9 @@
 import classNames from "classnames";
 import styles from "../app.module.scss";
 import {Link} from "react-router-dom";
-import {useState} from "react";
 import {useAuthToken} from "../hooks";
+import {NewItem} from "./ItemList";
 
-function NewItem({ sendNew }: any) {
-    const [title, setTitle] = useState('');
-
-    return (
-        <div className={styles.center} >
-            <label>Title</label><br/>
-            <input type={'text'} value={title} onChange={(e) => { setTitle(e.target.value) }} /><br/>
-            <button onClick={() => { sendNew(title); setTitle('')}}>Add new</button>
-        </div>
-    )
-}
 
 function ToSignUp({ user }: any) {
     return !user ? (

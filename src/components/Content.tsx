@@ -5,6 +5,7 @@ import {Link, Navigate} from "react-router-dom";
 
 import { gql, useQuery, useMutation } from '@apollo/client';
 import {useAuthToken} from "../hooks";
+import {ItemList} from "./ItemList";
 
 const CREATE_USER = gql`
     mutation CreateUser($login: String!, $password: String!, $fullName: String!)  {
@@ -48,6 +49,9 @@ const CREATE_TOKEN = gql`
 
 export default ({ ifList, pathname, loaded, userList }: any) => {
     const [{ token }] = useAuthToken();
+    if(token && ifList) {
+        return <div className={classNames(styles.box, styles.content, !ifList && styles.boxForm)}><ItemList /></div>
+    }
     let anotherScreen = <div>404 ERROR!!</div>
     switch (pathname) {
         case '/login':
@@ -60,8 +64,6 @@ export default ({ ifList, pathname, loaded, userList }: any) => {
             anotherScreen = token ? <ResetPasswordForm /> : <Navigate to="/login" />;
             break;
     }
-
-
 
     return (
         <div className={classNames(styles.box, styles.content, !ifList && styles.boxForm)}>{
