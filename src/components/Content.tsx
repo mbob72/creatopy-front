@@ -3,7 +3,7 @@ import styles from "../app.module.scss";
 import {useEffect, useState} from "react";
 import {Link, Navigate} from "react-router-dom";
 
-import { gql, useQuery, useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import {useAuthToken} from "../hooks";
 import {ItemList} from "./ItemList";
 
@@ -47,13 +47,14 @@ const CREATE_TOKEN = gql`
     }`
 
 
-export default ({ ifList, pathname, loaded, userList }: any) => {
+const Content = ({ ifList, pathname }: any) => {
     const [{ token }] = useAuthToken();
     if(token && ifList) {
         return <div className={classNames(styles.box, styles.content, !ifList && styles.boxForm)}><ItemList /></div>
     }
     let anotherScreen = <div>404 ERROR!!</div>
     switch (pathname) {
+        case '/':
         case '/login':
             anotherScreen = <LoginForm />;
             break;
@@ -66,12 +67,10 @@ export default ({ ifList, pathname, loaded, userList }: any) => {
     }
 
     return (
-        <div className={classNames(styles.box, styles.content, !ifList && styles.boxForm)}>{
-            ifList
-                ? loaded && (userList as any[]).map((item: any) => <div>{item.title}</div>)
-                : anotherScreen}</div>
+        <div className={classNames(styles.box, styles.content, !ifList && styles.boxForm)}>{anotherScreen}</div>
     )
 }
+export default Content
 function LoginForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState('')
